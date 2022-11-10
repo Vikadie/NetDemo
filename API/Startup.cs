@@ -41,6 +41,7 @@ namespace API
                 // Configuration is in fact our App Configuration (public IConfiguration) injected in out Startup class
                 // in fact our config is reading from the appsettings
             });
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +58,11 @@ namespace API
             // app.UseHttpsRedirection(); // should be used for HTTPs redirection
 
             app.UseRouting(); // middleware for routing
+
+            app.UseCors(opt => 
+            {
+                opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+            }); // CORS should be positioned right after the Routing in order to work properly
 
             app.UseAuthorization(); // middleware for authorization
 
