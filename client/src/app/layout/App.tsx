@@ -9,14 +9,20 @@ function App() {
     const paletteType = darkMode ? "dark" : "light";
     const theme = createTheme({
         palette: {
-            mode: paletteType
-        }
+            mode: paletteType,
+            background: {
+                default: darkMode ? "#121212" : "#eaeaea",
+            },
+            grey: {
+                400: darkMode ? "#616161" : "#bdbdbd",
+            }
+        },
     });
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Header state={darkMode} changeMode={() => setDarkMode(prevState => !prevState)}/>
+            <Header state={darkMode} changeMode={() => setDarkMode((prevState) => !prevState)} />
             <Container>
                 <Catalogue />
             </Container>
