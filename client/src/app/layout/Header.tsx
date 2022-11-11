@@ -1,4 +1,19 @@
-import { AppBar, FormControlLabel, styled, Switch, Toolbar, Typography } from "@mui/material";
+import {
+    AppBar,
+    Badge,
+    BadgeProps,
+    Box,
+    FormControlLabel,
+    IconButton,
+    List,
+    ListItem,
+    styled,
+    Switch,
+    Toolbar,
+    Typography,
+} from "@mui/material";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { NavLink } from "react-router-dom";
 
 interface Props {
     state: boolean;
@@ -52,14 +67,67 @@ export default function Header({ state, changeMode }: Props) {
             borderRadius: 20 / 2,
         },
     }));
+
+    const StyledBadge = styled(Badge)<BadgeProps>(({ theme }) => ({
+        "& .MuiBadge-badge": {
+            right: -4,
+            top: 4,
+            border: `1px solid ${theme.palette.background.paper}`,
+            padding: "0 2px",
+        },
+    }));
+
+    const midLinks = [
+        { title: "catalog", path: "catalog" },
+        { title: "about", path: "about" },
+        { title: "contact", path: "contact" },
+    ];
+
+    const rightLinks = [
+        { title: "login", path: "login" },
+        { title: "register", path: "register" },
+    ];
+
+    const sxProps = {
+        color: "inherit",
+        typography: "h6",
+        "&:hover": { color: "grey.500" },
+        "&.active": { color: "text.secondary" },
+        textDecoration: "none",
+    };
     return (
         <AppBar position="static" sx={{ mb: 4 }}>
-            <Toolbar>
-                <Typography variant="h6">Net Demo</Typography>
-                <FormControlLabel
-                    control={<MaterialUISwitch sx={{ m: 1 }} checked={state} onChange={changeMode} />}
-                    label=""
-                />
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Box display={'flex'} alignItems="center">
+                    <Typography variant="h6" component={NavLink} to={"/"} sx={sxProps}>
+                        Net Demo
+                    </Typography>
+                    <FormControlLabel
+                        control={<MaterialUISwitch sx={{ m: 1 }} checked={state} onChange={changeMode} />}
+                        label=""
+                    />
+                </Box>
+                <List sx={{ display: "flex" }}>
+                    {midLinks.map(({ title, path }) => (
+                        <ListItem component={NavLink} to={path} key={path} sx={sxProps}>
+                            {title.toUpperCase()}
+                        </ListItem>
+                    ))}
+                </List>
+                <Box display='flex' alignItems={"center"}>
+                    <IconButton aria-label="cart" sx={{ color: "inherit" }}>
+                        <StyledBadge badgeContent={4} color="secondary">
+                            <ShoppingCartIcon />
+                        </StyledBadge>
+                    </IconButton>
+                    <List sx={{ display: "flex" }}>
+                        {rightLinks.map(({ title, path }) => (
+                            <ListItem component={NavLink} to={path} key={path} sx={sxProps}>
+                                {title.toUpperCase()}
+                            </ListItem>
+                        ))}
+                    </List>
+                </Box>
             </Toolbar>
         </AppBar>
     );
