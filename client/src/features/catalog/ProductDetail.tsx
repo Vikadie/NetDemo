@@ -8,9 +8,11 @@ import {
     TableRow,
     Typography,
 } from "@mui/material";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import NotFound from "../../app/errors/NotFound";
+import agent from "../../app/http/agent";
+import Loading from "../../app/layout/Loading";
 import { Product } from "../../app/models/product";
 
 export default function ProductDetail() {
@@ -22,19 +24,18 @@ export default function ProductDetail() {
 
     useEffect(() => {
         setLoading(true);
-        axios
-            .get(`http://localhost:5000/api/products/${id}`)
-            .then((response) => setProduct(response.data))
+        agent.Catalog.details(id ? +id : 0)
+            .then(setProduct)
             .catch((err) => console.log(err))
             .finally(() => setLoading(false));
     }, [id]);
 
     if (loading) {
-        return <h3>Loading...</h3>;
+        return <Loading message="Loading product..."/>;
     }
 
     if (!product) {
-        return <h3>Product not found</h3>;
+        return <NotFound />;
     }
 
     return (

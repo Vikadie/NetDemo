@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
+using API.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -48,9 +49,10 @@ namespace API
         // this is for the middleware to add in our application
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseMiddleware<ExceptionMiddleware>();
             if (env.IsDevelopment()) // valid only if we are in development mode
             {
-                app.UseDeveloperExceptionPage(); // additional information on exceptions
+                // app.UseDeveloperExceptionPage(); // additional information on exceptions only in dev mode, replaced by our own
                 app.UseSwagger(); // middleware for swagger
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", ".NetDemo WebAPIv5 v1")); // this is for the visualization of swagger
             }
