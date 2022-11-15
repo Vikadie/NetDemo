@@ -63,8 +63,9 @@ namespace API
 
             app.UseCors(opt => 
             {
-                opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:3000");
             }); // CORS should be positioned right after the Routing in order to work properly
+            // AllowCredentials is needed to accept cookies from this origin
 
             app.UseAuthorization(); // middleware for authorization
 
