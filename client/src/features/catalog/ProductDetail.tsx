@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab";
 import {
     Divider,
     Grid,
@@ -6,10 +7,12 @@ import {
     TableCell,
     TableContainer,
     TableRow,
+    TextField,
     Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useStoreContext } from "../../app/ctx/StoreCtx";
 import NotFound from "../../app/errors/NotFound";
 import agent from "../../app/http/agent";
 import Loading from "../../app/layout/Loading";
@@ -17,21 +20,54 @@ import { Product } from "../../app/models/product";
 
 export default function ProductDetail() {
     const { id } = useParams<{ id: string }>();
+    const { basket, setBasket, removeItem } = useStoreContext();
 
     const [product, setProduct] = useState<Product | null>(null);
+    const [quantity, setQuantity] = useState(0);
+    const [submitting, setSubmitting] = useState(false);
+
+    const item = basket?.items.find((i) => i.productId === product?.id);
 
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (item) {
+            setQuantity(item.quantity);
+        }
         setLoading(true);
         agent.Catalog.details(id ? +id : 0)
             .then(setProduct)
             .catch((err) => console.log(err))
             .finally(() => setLoading(false));
-    }, [id]);
+    }, [id, item]);
+
+    function handleUpdateCart() {
+        setSubmitting(true);
+        // item.quantity is the initial value
+        if (item) {
+            if (quantity > item.quantity) {
+                agent.Basket.addItem(item.productId, quantity - item.quantity)
+                    .then(setBasket)
+                    .catch((err) => console.log(err))
+                    .finally(() => setSubmitting(false));
+            } else if (quantity < item.quantity) {
+                agent.Basket.removeItem(item.productId, item.quantity - quantity)
+                    .then(() => removeItem(item.productId, item.quantity - quantity))
+                    .catch((err) => console.log(err))
+                    .finally(() => setSubmitting(false));
+            }
+        } else {
+            if (quantity > 0 && product) {
+                agent.Basket.addItem(product?.id, quantity)
+                    .then(setBasket)
+                    .catch((err) => console.log(err))
+                    .finally(() => setSubmitting(false));
+            }
+        }
+    }
 
     if (loading) {
-        return <Loading message="Loading product..."/>;
+        return <Loading message="Loading product..." />;
     }
 
     if (!product) {
@@ -46,7 +82,9 @@ export default function ProductDetail() {
             <Grid item xs={6}>
                 <Typography variant="h3">{product.name}</Typography>
                 <Divider sx={{ mb: 2 }} />
-                <Typography variant="h5" color={"secondary"}>{(product.price / 100).toFixed(2)} BGN</Typography>
+                <Typography variant="h5" color={"secondary"}>
+                    {(product.price / 100).toFixed(2)} BGN
+                </Typography>
                 <TableContainer>
                     <Table>
                         <TableBody>
@@ -73,6 +111,32 @@ export default function ProductDetail() {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={6}>
+                        <TextField
+                            variant="outlined"
+                            type="number"
+                            label="Quantity in Cart"
+                            fullWidth
+                            value={quantity}
+                            onChange={(e) => +e.target.value >= 0 && setQuantity(+e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <LoadingButton
+                            sx={{ height: "55px" }}
+                            size="large"
+                            color="primary"
+                            variant="contained"
+                            fullWidth
+                            loading={submitting}
+                            onClick={handleUpdateCart}
+                            disabled={(!item && quantity === 0) || item?.quantity === quantity}
+                        >
+                            {item ? "Update Quantity" : "Add to Cart"}
+                        </LoadingButton>
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     );
