@@ -12,10 +12,11 @@ interface ErrorResponseData {
 }
 
 axios.defaults.baseURL = "http://localhost:5000/api/";
+axios.defaults.withCredentials = true; // needed to attach cookies
 
 const responseBody = (response: AxiosResponse) => response.data;
 
-const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
+const sleep = () => new Promise(resolve => setTimeout(resolve, 1500));
 
 
 // we use interceptors to handle the error better
@@ -76,9 +77,16 @@ const TestErrors = {
     getValidationError: () => requests.get("Buggy/validation-error"),
 };
 
+const Basket = {
+    getBasket: () => requests.get("Basket"),
+    addItem: (productId: number, quantity = 1) => requests.post(`Basket?productId=${productId}&quantity=${quantity}`, {}),
+    removeItem: (productId: number, quantity = 1) => requests.delete(`Basket?productId=${productId}&quantity=${quantity}`)
+}
+
 const agent = {
     Catalog,
     TestErrors,
+    Basket,
 };
 
 export default agent;

@@ -14,6 +14,8 @@ import {
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useStoreContext } from "../ctx/StoreCtx";
 
 interface Props {
     state: boolean;
@@ -21,6 +23,9 @@ interface Props {
 }
 
 export default function Header({ state, changeMode }: Props) {
+    const {basket} = useStoreContext();
+    const itemCount = basket?.items.reduce((acc, curr) => acc + curr.quantity, 0);
+
     const MaterialUISwitch = styled(Switch)(({ theme }) => ({
         width: 62,
         height: 34,
@@ -115,8 +120,8 @@ export default function Header({ state, changeMode }: Props) {
                     ))}
                 </List>
                 <Box display='flex' alignItems={"center"}>
-                    <IconButton aria-label="cart" sx={{ color: "inherit" }}>
-                        <StyledBadge badgeContent={4} color="secondary">
+                    <IconButton aria-label="cart" sx={{ color: "inherit" }} component={Link} to="basket">
+                        <StyledBadge badgeContent={itemCount} color="secondary">
                             <ShoppingCartIcon />
                         </StyledBadge>
                     </IconButton>

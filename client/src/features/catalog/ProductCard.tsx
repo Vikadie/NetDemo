@@ -9,10 +9,24 @@ import {
     CardHeader,
     Avatar,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import agent from "../../app/http/agent";
 import { Product } from "../../app/models/product";
+import { useStoreContext } from "../../app/ctx/StoreCtx";
 
 const ProductCard = ({ product }: { product: Product }) => {
+    const {setBasket} = useStoreContext();
+    const [loading, setLoading] = useState(false);
+
+    const handleAddItem = (productId: number) => {
+        setLoading(true);
+        agent.Basket.addItem(productId)
+            .then(setBasket)
+            .catch((err) => console.log(err))
+            .finally(() => setLoading(false));
+    };
     return (
         <Grid item xs={3}>
             <Card>
@@ -29,7 +43,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                 />
                 <CardMedia
                     image={product.pictureUrl}
-                    sx={{ height: 140, backgroundSize: "contain", bgcolor: 'grey.400' }}
+                    sx={{ height: 140, backgroundSize: "contain", bgcolor: "grey.400" }}
                     title={product.name}
                 />
                 <CardContent>
@@ -41,8 +55,12 @@ const ProductCard = ({ product }: { product: Product }) => {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button size="small">Add to Card</Button>
-                    <Button size="small" component={Link} to={`${product.id}`}>View</Button>
+                    <LoadingButton size="small" onClick={() => handleAddItem(product.id)} loading={loading}>
+                        Add to Card
+                    </LoadingButton>
+                    <Button size="small" component={Link} to={`${product.id}`}>
+                        View
+                    </Button>
                 </CardActions>
             </Card>
         </Grid>
