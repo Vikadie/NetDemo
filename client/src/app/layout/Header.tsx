@@ -15,7 +15,9 @@ import {
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { NavLink } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useStoreContext } from "../ctx/StoreCtx";
+import { useAppSelector } from "../store/configureStore";
+// import { store } from "../store/configureStore";
+// import { useStoreContext } from "../ctx/StoreCtx";
 
 interface Props {
     state: boolean;
@@ -23,7 +25,11 @@ interface Props {
 }
 
 export default function Header({ state, changeMode }: Props) {
-    const {basket} = useStoreContext();
+    // const {basket} = useStoreContext(); // using context
+    // using Redux store
+    // const {basket} = store.getState().basket;
+    // using Redux toolkit useSelector, or customly predefined useAppSelector
+    const { basket } = useAppSelector(state => state.basket);
     const itemCount = basket?.items.reduce((acc, curr) => acc + curr.quantity, 0);
 
     const MaterialUISwitch = styled(Switch)(({ theme }) => ({

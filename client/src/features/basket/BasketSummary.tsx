@@ -1,10 +1,13 @@
 import { TableContainer, Paper, Table, TableBody, TableRow, TableCell, Grid } from "@mui/material";
-import { useStoreContext } from "../../app/ctx/StoreCtx";
+// import { useStoreContext } from "../../app/ctx/StoreCtx";
+import { useAppSelector } from "../../app/store/configureStore";
 
 const LIMIT = 200;
 
 export default function BasketSummary() {
-    const { basket } = useStoreContext();
+    // const { basket } = useStoreContext(); // using context
+    // using Redux toolkit useSelector, or customly predefined useAppSelector
+    const { basket } = useAppSelector(state => state.basket);
 
     const subtotal = basket?.items.reduce((acc, item) => acc + item.quantity * item.price, 0) || 0;
     let deliveryFee = 0;

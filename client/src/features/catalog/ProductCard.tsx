@@ -14,16 +14,20 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import agent from "../../app/http/agent";
 import { Product } from "../../app/models/product";
-import { useStoreContext } from "../../app/ctx/StoreCtx";
+import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { setBasket } from "../basket/basketSlice";
+// import { useStoreContext } from "../../app/ctx/StoreCtx";
 
 const ProductCard = ({ product }: { product: Product }) => {
-    const {setBasket} = useStoreContext();
+    // const {setBasket} = useStoreContext(); // using context
+    // using Redux store
+    const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(false);
 
     const handleAddItem = (productId: number) => {
         setLoading(true);
         agent.Basket.addItem(productId)
-            .then(setBasket)
+            .then(basket => dispatch(setBasket(basket)))
             .catch((err) => console.log(err))
             .finally(() => setLoading(false));
     };

@@ -10,8 +10,9 @@ import {
     // IconButton,
     Box,
     Grid,
+    Button,
 } from "@mui/material";
-import { useStoreContext } from "../../app/ctx/StoreCtx";
+// import { useStoreContext } from "../../app/ctx/StoreCtx";
 import Typography from "@mui/material/Typography";
 import {
     // useEffect,
@@ -20,11 +21,17 @@ import {
 import agent from "../../app/http/agent";
 import { LoadingButton } from "@mui/lab";
 import BasketSummary from "./BasketSummary";
+import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { removeItem, setBasket } from "./basketSlice";
 // import Loading from "../../app/layout/Loading";
 // import { Basket } from "../../app/models/basket";
 
 const BasketPage = () => {
-    const { basket, setBasket, removeItem } = useStoreContext();
+    // const { basket, setBasket, removeItem } = useStoreContext();
+    // using Redux toolkit useSelector, or customly predefined useAppSelector
+    const { basket } = useAppSelector(state => state.basket);
+    const dispatch = useAppDispatch();
     const [status, setStatus] = useState<{ loading: boolean; id: string }>({
         loading: false,
         id: "",
@@ -33,7 +40,7 @@ const BasketPage = () => {
     const handleAddItem = (action: string, productId: number) => {
         setStatus({ loading: true, id: action + productId });
         agent.Basket.addItem(productId)
-            .then(setBasket)
+            .then(basket => dispatch(setBasket(basket)))
             .catch((err) => console.log(err))
             .finally(() =>
                 setStatus({
@@ -45,8 +52,8 @@ const BasketPage = () => {
     const handleRemoveItem = (action: string, productId: number, quantity = 1) => {
         setStatus({ loading: true, id: action + productId });
         agent.Basket.removeItem(productId, quantity)
-            .then(() => removeItem(productId, quantity))
-            // removeItem from context is used as agent.Basket.removeItem from API deletes on teh server, but doesn't return anything
+            .then(() => dispatch(removeItem({productId, quantity})))
+            // removeItem from context or dispatch(removeItem) from Redux are used as agent.Basket.removeItem from API deletes on the server, but doesn't return anything
             .catch((err) => console.log(err))
             .finally(() =>
                 setStatus({
@@ -145,6 +152,9 @@ const BasketPage = () => {
                 <Grid item xs={6}></Grid>
                 <Grid item xs={6}>
                     <BasketSummary />
+                    <Button component={Link} to={"/checkout"} size="large" fullWidth variant="contained">
+                        Checkout
+                    </Button>
                 </Grid>
             </Grid>
         </>

@@ -12,15 +12,20 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useStoreContext } from "../../app/ctx/StoreCtx";
+// import { useStoreContext } from "../../app/ctx/StoreCtx";
 import NotFound from "../../app/errors/NotFound";
 import agent from "../../app/http/agent";
 import Loading from "../../app/layout/Loading";
 import { Product } from "../../app/models/product";
+import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { removeItem, setBasket } from "../basket/basketSlice";
 
 export default function ProductDetail() {
     const { id } = useParams<{ id: string }>();
-    const { basket, setBasket, removeItem } = useStoreContext();
+    // const { basket, setBasket, removeItem } = useStoreContext(); // using context
+    // using Redux toolkit useSelector, or customly predefined useAppSelector
+    const { basket } = useAppSelector(state => state.basket);
+    const dispatch = useAppDispatch();
 
     const [product, setProduct] = useState<Product | null>(null);
     const [quantity, setQuantity] = useState(0);
@@ -47,12 +52,12 @@ export default function ProductDetail() {
         if (item) {
             if (quantity > item.quantity) {
                 agent.Basket.addItem(item.productId, quantity - item.quantity)
-                    .then(setBasket)
+                    .then(basket => dispatch(setBasket(basket)))
                     .catch((err) => console.log(err))
                     .finally(() => setSubmitting(false));
             } else if (quantity < item.quantity) {
                 agent.Basket.removeItem(item.productId, item.quantity - quantity)
-                    .then(() => removeItem(item.productId, item.quantity - quantity))
+                    .then(() => dispatch(removeItem({productId: item.productId, quantity: item.quantity - quantity})))
                     .catch((err) => console.log(err))
                     .finally(() => setSubmitting(false));
             }
