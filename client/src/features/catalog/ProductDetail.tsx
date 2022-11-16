@@ -14,64 +14,82 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 // import { useStoreContext } from "../../app/ctx/StoreCtx";
 import NotFound from "../../app/errors/NotFound";
-import agent from "../../app/http/agent";
+// import agent from "../../app/http/agent";
 import Loading from "../../app/layout/Loading";
-import { Product } from "../../app/models/product";
+// import { Product } from "../../app/models/product";
 import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
-import { removeItem, setBasket } from "../basket/basketSlice";
+import { addBasketItemAsync, removeBasketItemAsync, 
+    // setBasket 
+} from "../basket/basketSlice";
+import { fetchProductAsync, productSelectors } from "./catalogSlice";
 
 export default function ProductDetail() {
     const { id } = useParams<{ id: string }>();
     // const { basket, setBasket, removeItem } = useStoreContext(); // using context
     // using Redux toolkit useSelector, or customly predefined useAppSelector
-    const { basket } = useAppSelector(state => state.basket);
+    const { basket, status } = useAppSelector((state) => state.basket);
     const dispatch = useAppDispatch();
 
-    const [product, setProduct] = useState<Product | null>(null);
+    // const [product, setProduct] = useState<Product | null>(null); // not needed with Redux
+    const product = useAppSelector((state) => productSelectors.selectById(state, id!));
+    const { status: productStatus } = useAppSelector((state) => state.catalog);
     const [quantity, setQuantity] = useState(0);
-    const [submitting, setSubmitting] = useState(false);
+    // const [submitting, setSubmitting] = useState(false); //used only without Redux thunk for API requests
 
     const item = basket?.items.find((i) => i.productId === product?.id);
 
-    const [loading, setLoading] = useState(true);
+    // const [loading, setLoading] = useState(true); // replaced by status from catalogue
 
     useEffect(() => {
         if (item) {
             setQuantity(item.quantity);
         }
-        setLoading(true);
-        agent.Catalog.details(id ? +id : 0)
-            .then(setProduct)
-            .catch((err) => console.log(err))
-            .finally(() => setLoading(false));
-    }, [id, item]);
+        if (!product) {
+            dispatch(fetchProductAsync(parseInt(id!)));
+        }
+        // setLoading(true);
+        // agent.Catalog.details(id ? +id : 0)
+        //     .then(setProduct)
+        //     .catch((err) => console.log(err))
+        //     .finally(() => setLoading(false));
+    }, [id, item, product, dispatch]);
 
     function handleUpdateCart() {
-        setSubmitting(true);
-        // item.quantity is the initial value
-        if (item) {
-            if (quantity > item.quantity) {
-                agent.Basket.addItem(item.productId, quantity - item.quantity)
-                    .then(basket => dispatch(setBasket(basket)))
-                    .catch((err) => console.log(err))
-                    .finally(() => setSubmitting(false));
-            } else if (quantity < item.quantity) {
-                agent.Basket.removeItem(item.productId, item.quantity - quantity)
-                    .then(() => dispatch(removeItem({productId: item.productId, quantity: item.quantity - quantity})))
-                    .catch((err) => console.log(err))
-                    .finally(() => setSubmitting(false));
-            }
+        if (!item || quantity > item.quantity) {
+            const updatedQ = item ? quantity - item.quantity : quantity;
+            dispatch(addBasketItemAsync({ productId: product!.id, quantity: updatedQ }));
         } else {
-            if (quantity > 0 && product) {
-                agent.Basket.addItem(product?.id, quantity)
-                    .then(setBasket)
-                    .catch((err) => console.log(err))
-                    .finally(() => setSubmitting(false));
-            }
+            const updatedQ = item.quantity - quantity;
+            dispatch(removeBasketItemAsync({ productId: item.productId, quantity: updatedQ }));
         }
     }
 
-    if (loading) {
+    // function handleUpdateCart() { //used in this version only without Redux thunk for API requests
+    //     setSubmitting(true);
+    //     // item.quantity is the initial value
+    //     if (item) {
+    //         if (quantity > item.quantity) {
+    //             agent.Basket.addItem(item.productId, quantity - item.quantity)
+    //                 .then(basket => dispatch(setBasket(basket)))
+    //                 .catch((err) => console.log(err))
+    //                 .finally(() => setSubmitting(false));
+    //         } else if (quantity < item.quantity) {
+    //             agent.Basket.removeItem(item.productId, item.quantity - quantity)
+    //                 .then(() => dispatch(removeItem({productId: item.productId, quantity: item.quantity - quantity})))
+    //                 .catch((err) => console.log(err))
+    //                 .finally(() => setSubmitting(false));
+    //         }
+    //     } else {
+    //         if (quantity > 0 && product) {
+    //             agent.Basket.addItem(product?.id, quantity)
+    //                 .then(setBasket)
+    //                 .catch((err) => console.log(err))
+    //                 .finally(() => setSubmitting(false));
+    //         }
+    //     }
+    // }
+
+    if (productStatus === 'pendingFetchProducts') {
         return <Loading message="Loading product..." />;
     }
 
@@ -134,7 +152,7 @@ export default function ProductDetail() {
                             color="primary"
                             variant="contained"
                             fullWidth
-                            loading={submitting}
+                            loading={status.includes("pending")}
                             onClick={handleUpdateCart}
                             disabled={(!item && quantity === 0) || item?.quantity === quantity}
                         >
