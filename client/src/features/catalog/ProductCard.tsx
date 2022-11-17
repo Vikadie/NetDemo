@@ -36,7 +36,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
     const { status } = useAppSelector((state) => state.basket);
     return (
-        <Grid item xs={3}>
+        <Grid item xs={4}>
             <Card>
                 <CardHeader
                     avatar={

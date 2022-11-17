@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../..";
+import { PaginatedResponse } from "../models/pagination";
 
 interface ErrorResponseData {
     data: {
@@ -20,9 +21,15 @@ const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
 
 
 // we use interceptors to handle the error better
+// we use interceptors to take the response header information here
 axios.interceptors.response.use(
     async (response) => {
         await sleep();
+        // attention! when extracting data from headers Axios is working only with lower case, so use "pagination" (not "Pagination")
+        const pagination = response.headers["pagination"];
+        if (pagination) {
+            response.data = new PaginatedResponse(response.data, JSON.parse(pagination));
+        }
         return response; // onFulfilled (of Axios) if status in the range of 200
     },
     (error: AxiosError) => {
@@ -58,14 +65,14 @@ axios.interceptors.response.use(
 );
 
 const requests = {
-    get: (url: string) => axios.get(url).then(responseBody),
+    get: (url: string, params?: URLSearchParams) => axios.get(url, { params }).then(responseBody),
     post: (url: string, body: {}) => axios.post(url).then(responseBody),
     put: (url: string, body: {}) => axios.put(url).then(responseBody),
     delete: (url: string) => axios.delete(url).then(responseBody),
 };
 
 const Catalog = {
-    list: () => requests.get("products"),
+    list: (params: URLSearchParams) => requests.get("products", params),
     details: (id: number) => requests.get(`products/${id}`),
     filters: () => requests.get("products/filters"),
 };
