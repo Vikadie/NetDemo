@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Data
 {
     public class StoreContext : DbContext
+    // DbContext is a mixture of Unit of Work and Repository Patterns (meaning that we can use it to outsource the DB logic)
     {
         public StoreContext(DbContextOptions options) : base(options) // the base class is the DbContext class - we pass to it these options
         {

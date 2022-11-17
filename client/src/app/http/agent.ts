@@ -16,7 +16,7 @@ axios.defaults.withCredentials = true; // needed to attach cookies
 
 const responseBody = (response: AxiosResponse) => response.data;
 
-const sleep = () => new Promise(resolve => setTimeout(resolve, 1500));
+const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
 
 
 // we use interceptors to handle the error better
@@ -67,6 +67,7 @@ const requests = {
 const Catalog = {
     list: () => requests.get("products"),
     details: (id: number) => requests.get(`products/${id}`),
+    filters: () => requests.get("products/filters"),
 };
 
 const TestErrors = {
