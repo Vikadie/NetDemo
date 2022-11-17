@@ -15,9 +15,11 @@ import { Link } from "react-router-dom";
 // import agent from "../../app/http/agent";
 import { Product } from "../../app/models/product";
 import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
-import { addBasketItemAsync, 
+import {
+    addBasketItemAsync,
     // setBasket // needed when using the normal function
 } from "../basket/basketSlice";
+import ProductCardSkeleton from "./ProductFileSkeleton";
 // import { useStoreContext } from "../../app/ctx/StoreCtx";
 
 const ProductCard = ({ product }: { product: Product }) => {
@@ -35,46 +37,53 @@ const ProductCard = ({ product }: { product: Product }) => {
     // };
 
     const { status } = useAppSelector((state) => state.basket);
+
+    const { productsLoaded } = useAppSelector((state) => state.catalog);
+
     return (
         <Grid item xs={4}>
-            <Card>
-                <CardHeader
-                    avatar={
-                        <Avatar sx={{ bgcolor: "secondary.light" }}>
-                            {product.name.charAt(0).toUpperCase()}
-                        </Avatar>
-                    }
-                    title={product.name}
-                    titleTypographyProps={{
-                        sx: { fontWeight: "bold", color: "primary.main" },
-                    }}
-                />
-                <CardMedia
-                    image={product.pictureUrl}
-                    sx={{ height: 140, backgroundSize: "contain", bgcolor: "grey.400" }}
-                    title={product.name}
-                />
-                <CardContent>
-                    <Typography gutterBottom variant="h5" color="secondary">
-                        {(product.price / 100).toFixed(2)} BGN
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {product.brand} / {product.type}
-                    </Typography>
-                </CardContent>
-                <CardActions>
-                    <LoadingButton
-                        size="small"
-                        onClick={() => dispatch(addBasketItemAsync({ productId: product.id }))}
-                        loading={status.includes('pendingAddItem' + product.id)}
-                    >
-                        Add to Card
-                    </LoadingButton>
-                    <Button size="small" component={Link} to={`${product.id}`}>
-                        View
-                    </Button>
-                </CardActions>
-            </Card>
+            {!productsLoaded ? (
+                <ProductCardSkeleton />
+            ) : (
+                <Card>
+                    <CardHeader
+                        avatar={
+                            <Avatar sx={{ bgcolor: "secondary.light" }}>
+                                {product.name.charAt(0).toUpperCase()}
+                            </Avatar>
+                        }
+                        title={product.name}
+                        titleTypographyProps={{
+                            sx: { fontWeight: "bold", color: "primary.main" },
+                        }}
+                    />
+                    <CardMedia
+                        image={product.pictureUrl}
+                        sx={{ height: 140, backgroundSize: "contain", bgcolor: "grey.400" }}
+                        title={product.name}
+                    />
+                    <CardContent>
+                        <Typography gutterBottom variant="h5" color="secondary">
+                            {(product.price / 100).toFixed(2)} BGN
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            {product.brand} / {product.type}
+                        </Typography>
+                    </CardContent>
+                    <CardActions>
+                        <LoadingButton
+                            size="small"
+                            onClick={() => dispatch(addBasketItemAsync({ productId: product.id }))}
+                            loading={status.includes("pendingAddItem" + product.id)}
+                        >
+                            Add to Card
+                        </LoadingButton>
+                        <Button size="small" component={Link} to={`${product.id}`}>
+                            View
+                        </Button>
+                    </CardActions>
+                </Card>
+            )}
         </Grid>
     );
 };

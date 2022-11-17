@@ -1,4 +1,4 @@
-import { Box, Grid, Pagination, Paper, Typography } from "@mui/material";
+import { Grid, Paper } from "@mui/material";
 import {
     useEffect,
     // useState
@@ -11,7 +11,6 @@ import {
     fetchFilters,
     fetchProductsAsync,
     productSelectors,
-    setMetaData,
     setProductParams,
 } from "./catalogSlice";
 import ProductList from "./ProductList";
@@ -29,7 +28,7 @@ const sortOption = [
 const Catalogue = () => {
     // const [products, setProducts] = useState<Product[]>([]); // will be replaced by Redux Selectors provided by EntityAdaoter
     const products = useAppSelector(productSelectors.selectAll);
-    const { productsLoaded, status, filtersLoaded, brands, types, productParams, metaData } = useAppSelector(
+    const { productsLoaded, filtersLoaded, brands, types, productParams, metaData } = useAppSelector(
         (state) => state.catalog
     );
     const dispatch = useAppDispatch();
@@ -51,7 +50,7 @@ const Catalogue = () => {
         }
     }, [dispatch, filtersLoaded]);
 
-    if (status.includes("pending") || !metaData) return <Loading message="Loading products..." />;
+    if (!filtersLoaded) return <Loading message="Loading products..." />;
 
     return (
         <Grid container columnSpacing={4}>
@@ -88,10 +87,10 @@ const Catalogue = () => {
             </Grid>
             <Grid item xs={3} />
             <Grid item xs={9} sx={{ mb: 2 }}>
-                <AppPagination
+                {metaData && <AppPagination
                     metaData={metaData}
                     onPageChange={(page) => dispatch(setProductParams({ pageNumber: page }))}
-                />
+                />}
             </Grid>
         </Grid>
     );
