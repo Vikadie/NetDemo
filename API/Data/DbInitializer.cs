@@ -3,13 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Data
 {
     public static class DbInitializer // static is used in order not to need to instantianate this class
     {
-        public static void Initialize(StoreContext context)
+        public static async Task Initialize(StoreContext context, UserManager<User> userManager) // because of userManager the methods should be transferred from void -> async Task
         {
+            if(!userManager.Users.Any() )
+            {
+                 var user = new User
+                 { 
+                    UserName = "bob",
+                    Email = "bob@test.com"
+                 };
+                // useManager uses await operator => the function should become async Task
+                 await userManager.CreateAsync(user, "Pa$$w0rd"); // creating the user
+                 await userManager.AddToRoleAsync(user, "Member"); // adding the role of this user
+
+                 var admin = new User
+                 { 
+                    UserName = "admin",
+                    Email = "admin@test.com"
+                 };
+                // useManager uses await operator => the function should become async Task
+                 await userManager.CreateAsync(admin, "Pa$$w0rd"); // creating the admin user
+                 await userManager.AddToRolesAsync(admin, new[] {"Admin", "Member"}); // adding two roles of this user
+            }
             if (context.Products.Any()) return; // if there are products in my database, return without adding from below
 
             var products = new List<Product>
