@@ -22,7 +22,7 @@ import {
     // setBasket, 
     fetchBasketAsync } from "../../features/basket/basketSlice";
 import Login from "../../features/account/Login";
-import { Register } from "../../features/account/Register";
+import Register from "../../features/account/Register";
 import { fetchCurrentUser } from "../../features/account/accountSlice";
 
 function App() {
