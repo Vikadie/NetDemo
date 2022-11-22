@@ -16,6 +16,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { NavLink } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../store/configureStore";
+import SignedInMenu from "./SignedInMenu";
 // import { store } from "../store/configureStore";
 // import { useStoreContext } from "../ctx/StoreCtx";
 
@@ -30,6 +31,8 @@ export default function Header({ state, changeMode }: Props) {
     // const {basket} = store.getState().basket;
     // using Redux toolkit useSelector, or customly predefined useAppSelector
     const { basket } = useAppSelector(state => state.basket);
+    const { user } = useAppSelector(state => state.account);
+
     const itemCount = basket?.items.reduce((acc, curr) => acc + curr.quantity, 0);
 
     const MaterialUISwitch = styled(Switch)(({ theme }) => ({
@@ -131,14 +134,17 @@ export default function Header({ state, changeMode }: Props) {
                             <ShoppingCartIcon />
                         </StyledBadge>
                     </IconButton>
-                    <List sx={{ display: "flex" }}>
+                    {user ? (<SignedInMenu />) : (
+                        <List sx={{ display: "flex" }}>
                         {rightLinks.map(({ title, path }) => (
                             <ListItem component={NavLink} to={path} key={path} sx={sxProps}>
                                 {title.toUpperCase()}
                             </ListItem>
                         ))}
                     </List>
+                    )}                    
                 </Box>
+
             </Toolbar>
         </AppBar>
     );

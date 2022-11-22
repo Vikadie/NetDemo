@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../..";
 import { PaginatedResponse } from "../models/pagination";
+import { store } from "../store/configureStore";
 
 interface ErrorResponseData {
     data: {
@@ -19,6 +20,16 @@ const responseBody = (response: AxiosResponse) => response.data;
 
 const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
 
+axios.interceptors.request.use(
+    config => {
+        const token = store.getState().account.user?.token;
+        if (token) {
+            config.headers!.Authorization = `Bearer ${token}`; // should insist with the ! that the config.headers will exist (as we create it now)
+        }
+
+        return config;
+    }
+)
 
 // we use interceptors to handle the error better
 // we use interceptors to take the response header information here
@@ -66,8 +77,8 @@ axios.interceptors.response.use(
 
 const requests = {
     get: (url: string, params?: URLSearchParams) => axios.get(url, { params }).then(responseBody),
-    post: (url: string, body: {}) => axios.post(url).then(responseBody),
-    put: (url: string, body: {}) => axios.put(url).then(responseBody),
+    post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
+    put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
     delete: (url: string) => axios.delete(url).then(responseBody),
 };
 
@@ -91,10 +102,17 @@ const Basket = {
     removeItem: (productId: number, quantity = 1) => requests.delete(`Basket?productId=${productId}&quantity=${quantity}`)
 }
 
+const Account = {
+    login: (values: any) => requests.post("Account/login", values),
+    register: (values: any) => requests.post("Account/register", values),
+    currentUser: () => requests.get("Account/currentUser"),
+}
+
 const agent = {
     Catalog,
     TestErrors,
     Basket,
+    Account,
 };
 
 export default agent;

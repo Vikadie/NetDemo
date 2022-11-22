@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import agent from "../../app/http/agent";
 import { Basket } from "../../app/models/basket";
+import { getCookie } from "../../util/utils";
 
 interface BasketState {
     basket: Basket | null;
@@ -39,13 +40,30 @@ export const removeBasketItemAsync = createAsyncThunk<void, { productId: number,
     }
 )
 
+export const fetchBasketAsync = createAsyncThunk<Basket>(
+    'basket/fetchBasketAsync',
+    async (_, thunkAPI) => {
+        try {
+            return agent.Basket.getBasket();
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue({ error: error.data });
+        }
+    },
+    {
+        condition: () => {
+            const buyerId = getCookie("buyerId");
+            if (!buyerId) return false;
+        }
+    }
+)
+
 export const basketSlice = createSlice({
     name: "basket",
     initialState,
     reducers: {
-        setBasket: (state, action) => {
-            state.basket = action.payload;
-        },
+        // setBasket: (state, action) => {
+        //     state.basket = action.payload;
+        // },
         // removeItem: (state, action) => {
         //     const { productId, quantity } = action.payload;
         //     const itemIndex = state.basket?.items.findIndex((i) => i.productId === productId);
@@ -89,8 +107,16 @@ export const basketSlice = createSlice({
         builder.addCase(removeBasketItemAsync.rejected, (state, action) => {
             console.log('error', action.payload);
             state.status = 'idle';
-        })
+        });
+        builder.addCase(fetchBasketAsync.fulfilled, (state, action) => {
+            state.basket = action.payload;
+            state.status = 'idle';
+        });
+        builder.addCase(fetchBasketAsync.rejected, (state, action) => {
+            console.log('error', action.payload);
+            state.status = "idle";
+        });
     },
 });
 
-export const { setBasket } = basketSlice.actions;
+// export const { setBasket } = basketSlice.actions;
