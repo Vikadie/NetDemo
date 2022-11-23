@@ -61,9 +61,12 @@ export const basketSlice = createSlice({
     name: "basket",
     initialState,
     reducers: {
-        // setBasket: (state, action) => {
-        //     state.basket = action.payload;
-        // },
+        setBasket: (state, action) => {
+            state.basket = action.payload;
+        },
+        clearBasket: (state) => {
+            state.basket = null;
+        },
         // removeItem: (state, action) => {
         //     const { productId, quantity } = action.payload;
         //     const itemIndex = state.basket?.items.findIndex((i) => i.productId === productId);
@@ -119,4 +122,4 @@ export const basketSlice = createSlice({
     },
 });
 
-// export const { setBasket } = basketSlice.actions;
+export const { setBasket, clearBasket } = basketSlice.actions;

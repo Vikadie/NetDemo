@@ -6,22 +6,33 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Paper } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FieldValues, useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
 import { history } from "../.."; //required to redirect the user
 import { useAppDispatch } from "../../app/store/configureStore";
 import { signInUser } from "./accountSlice";
+// import { useMemo } from "react";
 
 export default function Login() {
     const dispatch = useAppDispatch();
+    const location = useLocation();
+
+    // const from = useMemo(() => {
+    //     const state = location.state as { from: Location };
+    //     if (state && state.from && state.from.pathname) {
+    //         return state.from?.pathname;
+    //     }
+
+    //     return null;
+    // }, [location]); // can be used in the submitForm function, in case it is coming from basket -> checkout button, thus sent from Checkout Page and no user is there.
 
     const {
         register,
         handleSubmit,
         formState: { isSubmitting, errors, isValid },
     } = useForm({
-        mode: 'all', // mode to use to validate the inputs
+        mode: "all", // mode to use to validate the inputs
     });
 
     // const [values, setValues] = React.useState({
@@ -46,8 +57,13 @@ export default function Login() {
         // } catch (error) {
         //     console.log(error);
         // } // no need with Redux
-        await dispatch(signInUser(data));
-        history.push('/catalog');
+        try {
+            await dispatch(signInUser(data));
+            // if it is coming from a specific location written in the location.state.from, it will go there, else in the '/catalog'
+            history.push(location.state?.from?.pathname || "/catalog"); 
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     return (

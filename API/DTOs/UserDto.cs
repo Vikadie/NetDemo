@@ -9,5 +9,6 @@ namespace API.DTOs
     {
         public string Email { get; set; } // in our UI we will display only the User Email
         public string Token { get; set; }
+        public BasketDto Basket { get; set; } // if there is anonymous basket created before the login, it will overwrite teh user's basket
     }
 }

@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { history } from "../..";
 import agent from "../../app/http/agent";
 import { User } from "../../app/models/user";
+import { setBasket } from "../basket/basketSlice";
 
 interface AccountState {
     user: User | null;
@@ -17,7 +18,9 @@ export const signInUser = createAsyncThunk<User, FieldValues>(
     "account/signInUser",
     async (data, thunkAPI) => {
         try {
-            const user = await agent.Account.login(data);
+            const userDto = await agent.Account.login(data); // userDto is returned from our API and it contains user details + basket(if exists)
+            const {basket, ...user} = userDto; // separating the basket from the user
+            if (basket) thunkAPI.dispatch(setBasket(basket)); // add the basket to our Redux state
             localStorage.setItem("user", JSON.stringify(user));
             return user;
         } catch (error: any) {
@@ -32,7 +35,9 @@ export const fetchCurrentUser = createAsyncThunk<User>(
         thunkAPI.dispatch(setUser(JSON.parse(localStorage.getItem("user")!))) // to set the token to our state if it is not set before
         // ! is allowed since it is for sure to have user Item in localStorage in order to get here, as we put it in teh condition
         try {
-            const user = await agent.Account.currentUser();
+            const userDto = await agent.Account.currentUser(); // userDto is returned from our API and it contains user details + basket(if exists)
+            const {basket, ...user} = userDto; // separating the basket from the user
+            if (basket) thunkAPI.dispatch(setBasket(basket)); // add the basket to our Redux state
             localStorage.setItem("user", JSON.stringify(user));
             return user;
         } catch (error: any) {
@@ -64,7 +69,7 @@ export const accountSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(signInUser.rejected, (state, action) => {
-            console.log(action.payload);
+            throw (action.payload);
         });
         builder.addCase(fetchCurrentUser.rejected, (state) => {
             // if it is still UnAuthorized or the JWT is wrong...

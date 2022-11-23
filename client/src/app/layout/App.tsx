@@ -18,17 +18,19 @@ import BasketPage from "../../features/basket/BasketPage";
 import Loading from "./Loading";
 import CheckoutPage from "../../features/checkout/CheckoutPage";
 import { useAppDispatch } from "../store/configureStore";
-import { 
-    // setBasket, 
-    fetchBasketAsync } from "../../features/basket/basketSlice";
+import {
+    // setBasket,
+    fetchBasketAsync,
+} from "../../features/basket/basketSlice";
 import Login from "../../features/account/Login";
 import Register from "../../features/account/Register";
 import { fetchCurrentUser } from "../../features/account/accountSlice";
+import PrivateRoute from "./PrivateRoute";
 
 function App() {
     // using context
     // const context = useStoreContext();
-    // const { setBasket } = context; 
+    // const { setBasket } = context;
     // using Redux toolkit
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(true);
@@ -72,7 +74,7 @@ function App() {
     });
 
     if (loading) {
-        return <Loading message="Initializing App..."/>
+        return <Loading message="Initializing App..." />;
     }
 
     return (
@@ -89,7 +91,9 @@ function App() {
                     <Route path="server-error" element={<ServerError />} />
                     <Route path="about" element={<AboutPage />} />
                     <Route path="basket" element={<BasketPage />} />
-                    <Route path="checkout" element={<CheckoutPage />} />
+                    <Route element={<PrivateRoute />}>
+                        <Route path="checkout" element={<CheckoutPage />} />
+                    </Route>
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<Register />} />
                     <Route path="*" element={<NotFound />} />

@@ -74,7 +74,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                         <LoadingButton
                             size="small"
                             onClick={() => dispatch(addBasketItemAsync({ productId: product.id }))}
-                            loading={status.includes("pendingAddItem" + product.id)}
+                            loading={status === ("pendingAddItem" + product.id)}
                         >
                             Add to Card
                         </LoadingButton>
