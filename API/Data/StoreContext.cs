@@ -10,7 +10,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class StoreContext : IdentityDbContext<User> // switch from DbContext to IdentityDbContext with the user class that we will use
+    public class StoreContext : IdentityDbContext<User, Role, int> // int in the end is needed to show that all our Identity classes uses int as Id fields
+    // switch from DbContext to IdentityDbContext with the user class that we will use
     // DbContext is a mixture of Unit of Work and Repository Patterns (meaning that we can use it to outsource the DB logic)
     {
         public StoreContext(DbContextOptions options) : base(options) // the base class is the DbContext class - we pass to it these options
@@ -29,10 +30,16 @@ namespace API.Data
         {
             base.OnModelCreating(builder); // it is an override of existing OnModelCreating function available inside IdentityDbContext
 
-            builder.Entity<IdentityRole>() //adds new data to the table inside migration
+            builder.Entity<User>() // we specify the User Entity
+                .HasOne(a => a.Address) // that has one novigation property address
+                .WithOne() // with one to one relationship, meaning one user with one address
+                .HasForeignKey<UserAddress>(a => a.Id) // useing the foreign key id inside the UserAddress class
+                .OnDelete(DeleteBehavior.Cascade); //when User Entity deleted, to delete the UserAddress as well
+
+            builder.Entity<Role>() //adds new data to the table inside migration
                 .HasData( //the data to be added
-                    new IdentityRole{Name="Member", NormalizedName="MEMBER"},
-                    new IdentityRole{Name="Admin", NormalizedName="ADMIN"}
+                    new Role{Id=1, Name="Member", NormalizedName="MEMBER"}, // the problem with using int as Id is that now it should be harcoded here
+                    new Role{Id=2, Name="Admin", NormalizedName="ADMIN"}
                 );
         }
     }

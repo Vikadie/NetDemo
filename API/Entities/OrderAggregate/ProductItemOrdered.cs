@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Entities.OrderAggregate
 {
+    [Owned]
     public class ProductItemOrdered
     {
         // contains snapshot of the item when it was ordered to keep the historic properties of an item when it was ordered

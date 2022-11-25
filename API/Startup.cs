@@ -82,7 +82,7 @@ namespace API
                     opt.User.RequireUniqueEmail = true; // we do not allow duplicate email
                 }
             )
-                .AddRoles<IdentityRole>()
+                .AddRoles<Role>()
                 .AddEntityFrameworkStores<StoreContext>(); // this provides access to UserManager class
             services.AddAuthentication( 
                 JwtBearerDefaults.AuthenticationScheme // inside we put unstruction what authentication scheme we will use
