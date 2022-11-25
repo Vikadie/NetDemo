@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Entities;
+using API.Entities.OrderAggregate;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,8 @@ namespace API.Data
         public DbSet<Product> Products { get; set; } // Products is the name of the table, Product is the row/data type as found in API/Entities, DbSet is simply of type table
         public DbSet<Basket> Baskets { get; set; } // creating a baskets table, to store all the baskets inside. Entity Framework will automatically creates additioanl table
         // in the backgroud for us when needed (for instant Basket table etc) but as we are not going to query thm, there is no need to create a separate DbSet for it
+
+        public DbSet<Order> Orders { get; set; }
 
         //alternative of seeding data (differs from the Initializer class previously created)
         protected override void OnModelCreating(ModelBuilder builder)
