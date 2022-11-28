@@ -1,5 +1,5 @@
 import { Box, Button, Paper, Step, StepLabel, Stepper, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import AddressForm from "./AddressForm";
 import PaymentForm from "./PaymentForm";
@@ -39,6 +39,17 @@ export default function CheckoutPage() {
         mode: "all",
         resolver: yupResolver(currentValidationScheme),
     }); // in methods we will store all our properties as in a context
+
+    // below our methods (when they are already working) we check if there is any savedAddress for this user inside a useEffect
+    useEffect(() => {
+        agent.Account.savedAddress()
+            .then(res => {
+                if (res) {
+                    // we reset our methods with the new data and saveAddress set to false
+                    methods.reset({ ...methods.getValues(), ...res, saveAddress: false})
+                }
+            })
+    }, [methods]);
 
     const handleNext = async (data: FieldValues) => {
         const { nameOnCard, saveAddress, ...shippingAddress } = data;

@@ -5,7 +5,8 @@ import AppTextInput from "../../app/components/AppTextInput";
 import AppCheckBox from "../../app/components/AppCheckBox";
 
 export default function AddressForm() {
-    const { control } = useFormContext(); // to store our controls in the form context, to remember the states between different components inside the <FormProvider>
+    const { control, formState } = useFormContext(); // to store our controls in the form context, to remember the states between different components inside the <FormProvider>
+    // formState is needed 
     // name of AppTextIput should correspond to these of our API class Address without the capital letter
     return (
         <>
@@ -38,6 +39,7 @@ export default function AddressForm() {
                 </Grid>
                 <Grid item xs={12}>
                     <AppCheckBox
+                        disabled={!formState.isDirty}
                         control={control}
                         name="saveAddress"
                         label="Save this as the default address"

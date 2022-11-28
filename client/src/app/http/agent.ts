@@ -106,6 +106,7 @@ const Account = {
     login: (values: any) => requests.post("Account/login", values),
     register: (values: any) => requests.post("Account/register", values),
     currentUser: () => requests.get("Account/currentUser"),
+    savedAddress: () => requests.get("Account/savedAddress"),
 }
 
 const Orders = {

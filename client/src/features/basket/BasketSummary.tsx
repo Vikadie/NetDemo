@@ -4,14 +4,16 @@ import { useAppSelector } from "../../app/store/configureStore";
 
 const LIMIT = 200;
 
-export default function BasketSummary() {
+export default function BasketSummary({ subtotal }: { subtotal?: number | undefined }) {
     // const { basket } = useStoreContext(); // using context
     // using Redux toolkit useSelector, or customly predefined useAppSelector
-    const { basket } = useAppSelector(state => state.basket);
+    const { basket } = useAppSelector((state) => state.basket);
 
-    const subtotal = basket?.items.reduce((acc, item) => acc + item.quantity * item.price, 0) || 0;
+    const subttl = !subtotal
+        ? basket?.items.reduce((acc, item) => acc + item.quantity * item.price, 0) || 0
+        : subtotal;
     let deliveryFee = 0;
-    if (subtotal > 0 && subtotal / 100 < LIMIT) {
+    if (subttl > 0 && subttl / 100 < LIMIT) {
         deliveryFee = 5;
     }
 
@@ -22,7 +24,7 @@ export default function BasketSummary() {
                     <TableBody>
                         <TableRow>
                             <TableCell colSpan={2}>Subtotal</TableCell>
-                            <TableCell align="right">{(subtotal / 100).toFixed(2)} BGN</TableCell>
+                            <TableCell align="right">{(subttl / 100).toFixed(2)} BGN</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell colSpan={2}>Delivery fee*</TableCell>
@@ -31,7 +33,7 @@ export default function BasketSummary() {
                         <TableRow>
                             <TableCell colSpan={2}>Total</TableCell>
                             <TableCell align="right">
-                                {((subtotal + deliveryFee * 100) / 100).toFixed(2)} BGN
+                                {((subttl + deliveryFee * 100) / 100).toFixed(2)} BGN
                             </TableCell>
                         </TableRow>
                         <TableRow>

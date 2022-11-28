@@ -26,6 +26,7 @@ import Login from "../../features/account/Login";
 import Register from "../../features/account/Register";
 import { fetchCurrentUser } from "../../features/account/accountSlice";
 import PrivateRoute from "./PrivateRoute";
+import Orders from "../../features/orders/Orders";
 
 function App() {
     // using context
@@ -93,6 +94,7 @@ function App() {
                     <Route path="basket" element={<BasketPage />} />
                     <Route element={<PrivateRoute />}>
                         <Route path="checkout" element={<CheckoutPage />} />
+                        <Route path="orders" element={<Orders />} />
                     </Route>
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<Register />} />
