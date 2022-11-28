@@ -11,6 +11,8 @@ namespace API.Entities
     // we can use directly IdentityUser class, but we cannot add custom fields inside without creating a Children class User
     {
         // add default address to a User
+
+        // This will require removing all DB and migrations and migrate again
         public UserAddress Address { get; set; }
     }
 }
