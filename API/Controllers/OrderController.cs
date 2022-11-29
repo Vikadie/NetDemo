@@ -92,7 +92,7 @@ namespace API.Controllers
                 ShippingAddress = orderDto.ShippingAddress,
                 SubTotal = subTotal,
                 DeliveryFee = deliveryFee,
-
+                PaymentIntentId = basket.PaymentIntentId // required to recognize the event sent from Stripe out the order payment
             };
 
             // track it in the EntityFramework
