@@ -15,6 +15,9 @@ namespace API.Entities.OrderAggregate
         public long SubTotal { get; set; }
         public long DeliveryFee { get; set; }
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending; // initially when created it will be pending
+        // required for Stripe
+        public string PaymentIntentId { get; set; }
+        // util funcs
         public long GetTotal()
         {
             return SubTotal + DeliveryFee;

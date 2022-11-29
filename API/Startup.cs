@@ -103,6 +103,9 @@ namespace API
 
             // adding our own created TokenService with a lifetime of the http request
             services.AddScoped<TokenService>();
+
+            // adding the Payment service creates with Stripe
+            services.AddScoped<PaymentService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
