@@ -115,12 +115,18 @@ const Orders = {
     create: (values: any) => requests.post(`Order`, values)
 }
 
+// connection with API in regards with Stripe
+const Payments = {
+    createPaymentIntent: () => requests.post('Payments', {}),
+}
+
 const agent = {
     Catalog,
     TestErrors,
     Basket,
     Account,
-    Orders
+    Orders,
+    Payments
 };
 
 export default agent;

@@ -10,21 +10,9 @@ import agent from "../../app/http/agent";
 import { useAppDispatch } from "../../app/store/configureStore";
 import { clearBasket } from "../basket/basketSlice";
 import { LoadingButton } from "@mui/lab";
+import { StripeElementType } from "@stripe/stripe-js";
 
 const steps = ["Shipping address", "Review your order", "Payment details"];
-
-function getStepContent(step: number) {
-    switch (step) {
-        case 0:
-            return <AddressForm />;
-        case 1:
-            return <Review />;
-        case 2:
-            return <PaymentForm />;
-        default:
-            throw new Error("Unknown step");
-    }
-}
 
 export default function CheckoutPage() {
     const dispatch = useAppDispatch();
@@ -32,6 +20,45 @@ export default function CheckoutPage() {
     // local state for newly created orderNumber
     const [orderNumber, setOrderNumber] = useState(0);
     const [loading, setLoading] = useState(false);
+
+    // local state of PaymentFrom to track the states
+    const [cardState, setCardState] = useState<{ elementError: { [key in StripeElementType]?: string } }>({
+        elementError: {},
+    });
+    // state to check if inputs in PaymentFrom are validated and complete
+    const [cardComplete, setCardComplete] = useState<any>({
+        cardNumber: false,
+        cardExpiry: false,
+        cardCvc: false,
+    });
+
+    // funciton to track the states in PaymentForm
+    function onCardInputChange(event: any) {
+        setCardState({
+            ...cardState,
+            elementError: {
+                ...cardState.elementError,
+                [event.elementType]: event.error?.message,
+            },
+        });
+        setCardComplete({
+            ...cardComplete,
+            [event.elementType]: event.complete,
+        });
+    }
+
+    function getStepContent(step: number) {
+        switch (step) {
+            case 0:
+                return <AddressForm />;
+            case 1:
+                return <Review />;
+            case 2:
+                return <PaymentForm cardState={cardState} onCardInputChange={onCardInputChange} />;
+            default:
+                throw new Error("Unknown step");
+        }
+    }
 
     const currentValidationScheme = validationSchema[activeStep];
     const methods = useForm({
@@ -42,13 +69,12 @@ export default function CheckoutPage() {
 
     // below our methods (when they are already working) we check if there is any savedAddress for this user inside a useEffect
     useEffect(() => {
-        agent.Account.savedAddress()
-            .then(res => {
-                if (res) {
-                    // we reset our methods with the new data and saveAddress set to false
-                    methods.reset({ ...methods.getValues(), ...res, saveAddress: false})
-                }
-            })
+        agent.Account.savedAddress().then((res) => {
+            if (res) {
+                // we reset our methods with the new data and saveAddress set to false
+                methods.reset({ ...methods.getValues(), ...res, saveAddress: false });
+            }
+        });
     }, [methods]);
 
     const handleNext = async (data: FieldValues) => {
@@ -78,6 +104,15 @@ export default function CheckoutPage() {
         setActiveStep(activeStep - 1);
     };
 
+    const submitDisabled =
+        activeStep === steps.length - 1
+            ? // on PaymentForm
+              !cardComplete.cardCvc ||
+              !cardComplete.cardExpiry ||
+              !cardComplete.cardNumber ||
+              !methods.formState.isValid
+            : !methods.formState.isValid;
+
     return (
         <FormProvider {...methods}>
             <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
@@ -98,8 +133,8 @@ export default function CheckoutPage() {
                                 Thank you for your order.
                             </Typography>
                             <Typography variant="subtitle1">
-                                Your order number is #{orderNumber}. We have emailed your order confirmation, and
-                                will send you an update when your order has shipped. Still fake!
+                                Your order number is #{orderNumber}. We have emailed your order confirmation,
+                                and will send you an update when your order has shipped. Still fake!
                             </Typography>
                         </>
                     ) : (
@@ -116,7 +151,7 @@ export default function CheckoutPage() {
                                     variant="contained"
                                     type="submit"
                                     sx={{ mt: 3, ml: 1 }}
-                                    disabled={!methods.formState.isValid}
+                                    disabled={submitDisabled}
                                 >
                                     {activeStep === steps.length - 1 ? "Place order" : "Next"}
                                 </LoadingButton>

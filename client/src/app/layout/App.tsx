@@ -16,7 +16,6 @@ import BasketPage from "../../features/basket/BasketPage";
 // import { getCookie } from "../../util/utils";
 // import agent from "../http/agent";
 import Loading from "./Loading";
-import CheckoutPage from "../../features/checkout/CheckoutPage";
 import { useAppDispatch } from "../store/configureStore";
 import {
     // setBasket,
@@ -27,6 +26,7 @@ import Register from "../../features/account/Register";
 import { fetchCurrentUser } from "../../features/account/accountSlice";
 import PrivateRoute from "./PrivateRoute";
 import Orders from "../../features/orders/Orders";
+import CheckoutWrapper from "../../features/checkout/CheckoutWrapper";
 
 function App() {
     // using context
@@ -93,7 +93,7 @@ function App() {
                     <Route path="about" element={<AboutPage />} />
                     <Route path="basket" element={<BasketPage />} />
                     <Route element={<PrivateRoute />}>
-                        <Route path="checkout" element={<CheckoutPage />} />
+                        <Route path="checkout" element={<CheckoutWrapper />} />
                         <Route path="orders" element={<Orders />} />
                     </Route>
                     <Route path="login" element={<Login />} />
