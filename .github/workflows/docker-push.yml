@@ -1,30 +1,36 @@
 name: docker-push
 
 on:
-  workflow_dispatch: # to run it manually
-  # push: # to run it automatically
-  #   branches:
-  #     - 'main'
-
+    workflow_dispatch: # to run it manually
+    push: # to run it automatically
+      branches:
+        - 'main'
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 jobs: # can have multiple jobs
-  docker: # name of the job
-    runs-on: ubuntu-latest
-    steps:
-      -
-        name: Set up Docker Buildx # step to build our image
-        uses: docker/setup-buildx-action@v2
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-        # specify the folder where to find the Dockerfile
-          context: "{{defaultContext}}:API"
-          push: true
-          # set the correct docker user/image
-          tags: vikadie/netapp:latest
+    docker: # name of the job
+        runs-on: ubuntu-latest
+        steps:
+            - name: Set up Docker Buildx # step to build our image
+              uses: docker/setup-buildx-action@v2
+            - name: Login to Docker Hub
+              uses: docker/login-action@v2
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+            - name: Build and push
+              uses: docker/build-push-action@v3
+              with:
+                  # specify the folder where to find the Dockerfile
+                  context: "{{defaultContext}}:API"
+                  push: true
+                  # set the correct docker user/image
+                  tags: vikadie/netapp:latest`
+    deploy:
+        needs: docker # saying that it needs to finish the docker job before starting this one
+        name: Deploy app
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: superfly/flyctl-actions/setup-flyctl@master
+            - run: flyctl deploy --remote-only
