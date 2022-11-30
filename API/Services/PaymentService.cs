@@ -28,7 +28,7 @@ namespace API.Services
             var intent = new PaymentIntent();
             // 4/ specify how much the items in our basket worth - price should come from Product table
             var subtotal = basket.Items.Sum(item => item.Quantity * item.Product.Price);
-            var deliveryFee = subtotal > 20000 ? 0 : 500;
+            var deliveryFee = subtotal >= 20000 ? 0 : 500;
 
             // 5/ check to see if we should update or create new payment intent
             if (string.IsNullOrEmpty(basket.PaymentIntentId)) {
