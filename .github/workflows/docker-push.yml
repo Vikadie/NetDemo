@@ -1,0 +1,30 @@
+name: docker-push
+
+on:
+  workflow_dispatch: # to run it manually
+  # push: # to run it automatically
+  #   branches:
+  #     - 'main'
+
+jobs: # can have multiple jobs
+  docker: # name of the job
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Set up Docker Buildx # step to build our image
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+        # specify the folder where to find the Dockerfile
+          context: "{{defaultContext}}:API"
+          push: true
+          # set the correct docker user/image
+          tags: vikadie/netapp:latest
