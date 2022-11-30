@@ -24,7 +24,7 @@ jobs: # can have multiple jobs
                   # specify the folder where to find the Dockerfile
                   context: "{{defaultContext}}:API"
                   push: true
-                  tags: vikadie/netapp:latest`
+                  tags: vikadie/netapp:latest
                   # set the correct docker user/image
     deploy:
         needs: docker # saying that it needs to finish the docker job before starting this one
