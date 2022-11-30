@@ -83,24 +83,31 @@ function App() {
             <ToastContainer position="bottom-right" theme="colored" hideProgressBar />
             <CssBaseline />
             <Header state={darkMode} changeMode={() => setDarkMode((prevState) => !prevState)} />
-            <Container>
-                <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="catalog" element={<Catalogue />} />
-                    <Route path="catalog/:id" element={<ProductDetail />} />
-                    <Route path="contact" element={<ContactPage />} />
-                    <Route path="server-error" element={<ServerError />} />
-                    <Route path="about" element={<AboutPage />} />
-                    <Route path="basket" element={<BasketPage />} />
-                    <Route element={<PrivateRoute />}>
-                        <Route path="checkout" element={<CheckoutWrapper />} />
-                        <Route path="orders" element={<Orders />} />
-                    </Route>
-                    <Route path="login" element={<Login />} />
-                    <Route path="register" element={<Register />} />
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
-            </Container>
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route
+                    path="*"
+                    element={
+                        <Container sx={{ mt: 4 }}>
+                            <Routes>
+                                <Route path="catalog" element={<Catalogue />} />
+                                <Route path="catalog/:id" element={<ProductDetail />} />
+                                <Route path="contact" element={<ContactPage />} />
+                                <Route path="server-error" element={<ServerError />} />
+                                <Route path="about" element={<AboutPage />} />
+                                <Route path="basket" element={<BasketPage />} />
+                                <Route element={<PrivateRoute />}>
+                                    <Route path="checkout" element={<CheckoutWrapper />} />
+                                    <Route path="orders" element={<Orders />} />
+                                </Route>
+                                <Route path="login" element={<Login />} />
+                                <Route path="register" element={<Register />} />
+                                <Route path="*" element={<NotFound />} />
+                            </Routes>
+                        </Container>
+                    }
+                />
+            </Routes>
         </ThemeProvider>
     );
 }

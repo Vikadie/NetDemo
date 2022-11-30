@@ -25,7 +25,7 @@ export default function SignedInMenu() {
             <Button color="inherit" onClick={handleClick} sx={{ typography: 'h6', ml: 2}}>{user?.email}</Button>
             <Menu anchorEl={anchorEl} open={open} onClose={handleClose} TransitionComponent={Fade}>
                 <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem component={Link} to={"\orders"} onClick={handleClose}>My orders</MenuItem>
+                <MenuItem component={Link} to={"/orders"} onClick={handleClose}>My orders</MenuItem>
                 <MenuItem onClick={() => {
                     dispatch(clearBasket());
                     dispatch(signOut());

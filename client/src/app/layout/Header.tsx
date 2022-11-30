@@ -110,7 +110,7 @@ export default function Header({ state, changeMode }: Props) {
         textDecoration: "none",
     };
     return (
-        <AppBar position="static" sx={{ mb: 4 }}>
+        <AppBar position="static">
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <Box display={'flex'} alignItems="center">
                     <Typography variant="h6" component={NavLink} to={"/"} sx={sxProps}>

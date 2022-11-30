@@ -9,6 +9,9 @@ import CustomRouter from "./app/Router/CustomRouter";
 import { Provider } from "react-redux";
 import { store } from "./app/store/configureStore";
 // import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
+// Import css files for the carousel
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export const history = createBrowserHistory();
 
