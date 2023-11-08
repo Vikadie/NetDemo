@@ -68,7 +68,7 @@ export const accountSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(signInUser.rejected, (state, action) => {
+        builder.addCase(signInUser.rejected, (_, action) => {
             throw action.payload;
         });
         builder.addCase(fetchCurrentUser.rejected, (state) => {

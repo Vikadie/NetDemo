@@ -11,7 +11,7 @@ export function AppPagination({ metaData, onPageChange }: Props) {
     const firstPosition = (currentPage - 1) * pageSize + 1;
     const lastPosition = currentPage * pageSize < totalCount ? currentPage * pageSize : totalCount;
 
-    const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    const handleChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         onPageChange(value);
     };
     return (
