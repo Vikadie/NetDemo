@@ -29,6 +29,7 @@ namespace API.Controllers
         [HttpGet(Name = "GetBasket")]
         public async Task<ActionResult<BasketDto>> GetBasket()
         {
+            Console.WriteLine("Get BUYER ID: " + GetBuyerId());
             // it will create a ByuerId sent as cookie
             var basket = await RetrieveBasket(GetBuyerId());
 
@@ -84,7 +85,7 @@ namespace API.Controllers
             if (string.IsNullOrEmpty(buyerId)) // means that we have to work with anonymous basket
             {
                 buyerId = Guid.NewGuid().ToString(); // so we create a Guid gor the buyer
-                
+
                 // cookie options creation
                 var cookieOptions = new CookieOptions
                 {

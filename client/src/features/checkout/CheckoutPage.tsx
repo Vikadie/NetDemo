@@ -21,7 +21,7 @@ export default function CheckoutPage() {
     // local state for the payment message received from Stripe eventually
     const [paymentMessage, setPaymentMessage] = useState("");
     const [paymentSucceeded, setPaymentSucceeded] = useState(false);
-    const { basket } = useAppSelector(state => state.basket); // used for teh ClientSecret
+    const { basket } = useAppSelector((state) => state.basket); // used for teh ClientSecret
     const stripe = useStripe(); // privides the function to create the actual payment
     const elements = useElements(); // to get details for the card itself as privided by Stripe
 
@@ -88,20 +88,24 @@ export default function CheckoutPage() {
     async function submitOrder(data: FieldValues) {
         setLoading(true);
         const { nameOnCard, saveAddress, ...shippingAddress } = data;
-        if (!stripe || !elements) return; // stripe is not ready
+        if (!stripe || !elements || !basket?.clientSecret) {
+            // Stripe.js hasn't yet loaded.
+            // Make sure to disable form submission until Stripe.js has loaded.
+            return;
+        } // stripe is not ready
         try {
             const cardElement = elements.getElement(CardNumberElement);
-            const paymentResult = await stripe.confirmCardPayment(basket?.clientSecret!, {
+            const paymentResult = await stripe.confirmCardPayment(basket.clientSecret, {
                 payment_method: {
                     card: cardElement!,
                     billing_details: {
-                        name: nameOnCard // sending additional properties
-                    }
-                }
+                        name: nameOnCard, // sending additional properties
+                    },
+                },
             });
             console.log(paymentResult);
 
-            if (paymentResult.paymentIntent?.status === 'succeeded') {
+            if (paymentResult.paymentIntent?.status === "succeeded") {
                 // create the order
                 const orderNumber = await agent.Orders.create({
                     saveAddress,
@@ -115,7 +119,7 @@ export default function CheckoutPage() {
                 dispatch(clearBasket());
                 setLoading(false);
             } else {
-                setPaymentMessage(paymentResult.error?.message!);
+                setPaymentMessage(paymentResult.error?.message || "Payment failed");
                 setPaymentSucceeded(false);
                 setLoading(false);
                 setActiveStep(activeStep + 1);
@@ -124,7 +128,6 @@ export default function CheckoutPage() {
             console.log(error);
             setLoading(false);
         }
-
     }
 
     const handleNext = async (data: FieldValues) => {
@@ -167,12 +170,17 @@ export default function CheckoutPage() {
                             <Typography variant="h5" gutterBottom>
                                 {paymentMessage}
                             </Typography>
-                            {paymentSucceeded ? 
-                            <Typography variant="subtitle1">
-                                Your order number is #{orderNumber}. We have emailed your order confirmation,
-                                and will send you an update when your order has shipped. Still fake!
-                            </Typography> :
-                            <Button onClick={handleBack} variant="contained">Go back and try again</Button>}
+                            {paymentSucceeded ? (
+                                <Typography variant="subtitle1">
+                                    Your order number is #{orderNumber}. We have emailed your order
+                                    confirmation, and will send you an update when your order has shipped.
+                                    Still fake!
+                                </Typography>
+                            ) : (
+                                <Button onClick={handleBack} variant="contained">
+                                    Go back and try again
+                                </Button>
+                            )}
                         </>
                     ) : (
                         <form onSubmit={methods.handleSubmit(handleNext)}>

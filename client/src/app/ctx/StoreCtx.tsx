@@ -7,8 +7,10 @@ interface StoreContextValue {
     removeItem: (productId: number, quantity: number) => void;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const CTX = createContext<StoreContextValue | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useStoreContext() {
     const context = useContext(CTX);
 
@@ -25,7 +27,7 @@ export function CtxProvider({ children }: PropsWithChildren<any>) {
     const removeItem = (productId: number, quantity: number) => {
         if (!basket) return;
         const items = [...basket.items];
-        const itemIndex = items.findIndex((i) => (i.productId === productId));
+        const itemIndex = items.findIndex((i) => i.productId === productId);
         if (itemIndex >= 0) {
             items[itemIndex].quantity -= quantity;
             if (items[itemIndex].quantity <= 0) {

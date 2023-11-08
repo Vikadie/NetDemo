@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
-import { history } from "../..";
 import { PaginatedResponse } from "../models/pagination";
 import { store } from "../store/configureStore";
+import router from "../router/Router";
 
 interface ErrorResponseData {
     data: {
@@ -13,29 +13,29 @@ interface ErrorResponseData {
     status: number;
 }
 
-axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+// axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true; // needed to attach cookies
 
 const responseBody = (response: AxiosResponse) => response.data;
 
-const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
+const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
 
-axios.interceptors.request.use(
-    config => {
-        const token = store.getState().account.user?.token;
-        if (token) {
-            config.headers!.Authorization = `Bearer ${token}`; // should insist with the ! that the config.headers will exist (as we create it now)
-        }
-
-        return config;
+axios.interceptors.request.use((config) => {
+    const token = store.getState().account.user?.token;
+    if (token) {
+        config.headers!.Authorization = `Bearer ${token}`; // should insist with the ! that the config.headers will exist (as we create it now)
     }
-)
+
+    return config;
+});
 
 // we use interceptors to handle the error better
 // we use interceptors to take the response header information here
 axios.interceptors.response.use(
     async (response) => {
-        if (process.env.NODE_ENV === "development") await sleep();
+        // if (process.env.NODE_ENV === "development") await sleep();
+        if (import.meta.env.DEV) await sleep();
         // attention! when extracting data from headers Axios is working only with lower case, so use "pagination" (not "Pagination")
         const pagination = response.headers["pagination"];
         if (pagination) {
@@ -50,9 +50,9 @@ axios.interceptors.response.use(
             case 400:
                 if (data.errors) {
                     const modelStateErrors: string[] = [];
-                    for (const key in data.errors){
+                    for (const key in data.errors) {
                         if (data.errors[key]) {
-                            modelStateErrors.push(data.errors[key])
+                            modelStateErrors.push(data.errors[key]);
                         }
                     }
                     throw modelStateErrors.flat(); // we stop execution up to here
@@ -63,10 +63,10 @@ axios.interceptors.response.use(
                 toast.error(data.title);
                 break;
             case 404:
-                history.push('/notFound', { error: data });
+                router.navigate("/notFound", { state: { error: data } });
                 break;
             case 500:
-                history.push('/server-error', { error: data });
+                router.navigate("/server-error", { state: { error: data } });
                 break;
             default:
                 break;
@@ -77,8 +77,8 @@ axios.interceptors.response.use(
 
 const requests = {
     get: (url: string, params?: URLSearchParams) => axios.get(url, { params }).then(responseBody),
-    post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
-    put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
+    post: (url: string, body: object) => axios.post(url, body).then(responseBody),
+    put: (url: string, body: object) => axios.put(url, body).then(responseBody),
     delete: (url: string) => axios.delete(url).then(responseBody),
 };
 
@@ -98,27 +98,29 @@ const TestErrors = {
 
 const Basket = {
     getBasket: () => requests.get("Basket"),
-    addItem: (productId: number, quantity = 1) => requests.post(`Basket?productId=${productId}&quantity=${quantity}`, {}),
-    removeItem: (productId: number, quantity = 1) => requests.delete(`Basket?productId=${productId}&quantity=${quantity}`)
-}
+    addItem: (productId: number, quantity = 1) =>
+        requests.post(`Basket?productId=${productId}&quantity=${quantity}`, {}),
+    removeItem: (productId: number, quantity = 1) =>
+        requests.delete(`Basket?productId=${productId}&quantity=${quantity}`),
+};
 
 const Account = {
     login: (values: any) => requests.post("Account/login", values),
     register: (values: any) => requests.post("Account/register", values),
     currentUser: () => requests.get("Account/currentUser"),
     savedAddress: () => requests.get("Account/savedAddress"),
-}
+};
 
 const Orders = {
     list: () => requests.get("Order"),
     fetch: (id: number) => requests.get(`Order/${id}`),
-    create: (values: any) => requests.post(`Order`, values)
-}
+    create: (values: any) => requests.post(`Order`, values),
+};
 
 // connection with API in regards with Stripe
 const Payments = {
-    createPaymentIntent: () => requests.post('Payments', {}),
-}
+    createPaymentIntent: () => requests.post("Payments", {}),
+};
 
 const agent = {
     Catalog,
@@ -126,7 +128,7 @@ const agent = {
     Basket,
     Account,
     Orders,
-    Payments
+    Payments,
 };
 
 export default agent;

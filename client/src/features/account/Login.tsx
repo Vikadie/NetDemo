@@ -9,9 +9,10 @@ import { Paper } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { FieldValues, useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
-import { history } from "../.."; //required to redirect the user
+// import { history } from "../.."; //required to redirect the user when using the old history way with boilerplate code in the index.tsx
 import { useAppDispatch } from "../../app/store/configureStore";
 import { signInUser } from "./accountSlice";
+import router from "../../app/router/Router";
 // import { useMemo } from "react";
 
 export default function Login() {
@@ -60,7 +61,7 @@ export default function Login() {
         try {
             await dispatch(signInUser(data));
             // if it is coming from a specific location written in the location.state.from, it will go there, else in the '/catalog'
-            history.push(location.state?.from?.pathname || "/catalog"); 
+            router.navigate(location.state?.from?.pathname || "/catalog");
         } catch (err) {
             console.log(err);
         }

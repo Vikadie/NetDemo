@@ -1,17 +1,10 @@
 import { Container, createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+// import { createTheme } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import AboutPage from "../../features/about/AboutPage";
-import Catalogue from "../../features/catalog/Catalog";
-import ProductDetail from "../../features/catalog/ProductDetail";
-import ContactPage from "../../features/contact/ContactPage";
-import HomePage from "../../features/home/HomePage";
 import Header from "./Header";
 import "react-toastify/dist/ReactToastify.css";
-import ServerError from "../errors/ServerError";
-import NotFound from "../errors/NotFound";
-import BasketPage from "../../features/basket/BasketPage";
 // import { useStoreContext } from "../ctx/StoreCtx";
 // import { getCookie } from "../../util/utils";
 // import agent from "../http/agent";
@@ -21,12 +14,8 @@ import {
     // setBasket,
     fetchBasketAsync,
 } from "../../features/basket/basketSlice";
-import Login from "../../features/account/Login";
-import Register from "../../features/account/Register";
 import { fetchCurrentUser } from "../../features/account/accountSlice";
-import PrivateRoute from "./PrivateRoute";
-import Orders from "../../features/orders/Orders";
-import CheckoutWrapper from "../../features/checkout/CheckoutWrapper";
+import HomePage from "../../features/home/HomePage";
 
 function App() {
     // using context
@@ -35,6 +24,8 @@ function App() {
     // using Redux toolkit
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(true);
+
+    const location = useLocation();
 
     const initApp = useCallback(async () => {
         try {
@@ -74,16 +65,21 @@ function App() {
         },
     });
 
-    if (loading) {
-        return <Loading message="Initializing App..." />;
-    }
-
     return (
         <ThemeProvider theme={theme}>
             <ToastContainer position="bottom-right" theme="colored" hideProgressBar />
             <CssBaseline />
             <Header state={darkMode} changeMode={() => setDarkMode((prevState) => !prevState)} />
-            <Routes>
+            {loading ? (
+                <Loading message="Initializing App..." />
+            ) : location.pathname === "/" ? (
+                <HomePage />
+            ) : (
+                <Container sx={{ mt: 4 }}>
+                    <Outlet />
+                </Container>
+            )}
+            {/* <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route
                     path="*"
@@ -107,7 +103,7 @@ function App() {
                         </Container>
                     }
                 />
-            </Routes>
+            </Routes> */}
         </ThemeProvider>
     );
 }
