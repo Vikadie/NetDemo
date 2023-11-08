@@ -17,7 +17,7 @@ COPY . ./
 RUN dotnet publish -c Release -o out
 
 # build a runtime image (we do not need sdk from this point), so we need new image with the runtime only (which is much smaller)
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
 # new work directory again
 WORKDIR /app
 # copy everyting staged in our build-environment /app/out into our app folder (current working directory marked with . at the end)
