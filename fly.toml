@@ -13,6 +13,8 @@ processes = []
   ASPNETCORE_URLS="http://+:8080"
   # for non-secret information: use the user-secrets but replace the : with __
   StripeSettings__PublishableKey="pk_test_51M9PrMAoIiuUMknDEa6MV90rGt7tWMwRzw3pVoPgr4hzrRGOQJyZrJ2ro8gsE5XnGe6XjLtrKkaMPXIiC9KrSCmi00gx3hw8uq"
+  Cloudinary__CloudName="dseesqqzo"
+  Cloudinary__ApiKey="523881577731851"
   # the secret key will be done using "flyctl secrets"
 
 [experimental]

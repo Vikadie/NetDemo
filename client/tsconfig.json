@@ -19,7 +19,6 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src"
-, "src/index.tsx"  ],
+    "src", "src/index.tsx"  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

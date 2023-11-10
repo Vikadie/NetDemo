@@ -14,7 +14,7 @@ const RequireAuth = ({ roles }: Props) => {
         return <Navigate to="/login" state={{ from: location }} />;
     }
 
-    if (roles && !roles.some((r) => r /* user.roles?.includes(r) */)) {
+    if (roles && !roles.some((r) => user.roles?.includes(r))) {
         toast.error("Not authorized to access this area");
         return <Navigate to="/catalog" />;
     }

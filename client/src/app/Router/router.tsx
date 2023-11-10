@@ -13,6 +13,7 @@ import Login from "../../features/account/Login";
 import Register from "../../features/account/Register";
 import ErrorPage from "./ErrorPage";
 import RequireAuth from "./RequireAuth";
+import Inventory from "../../features/admin/Inventory";
 
 export const router1 = createBrowserRouter(
     createRoutesFromElements(
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         children: [
             {
+                // authenticated routes
                 element: <RequireAuth />,
                 children: [
                     {
@@ -44,11 +46,12 @@ const router = createBrowserRouter([
                 ],
             },
             {
+                // admin routes
                 element: <RequireAuth roles={["Admin"]} />,
                 children: [
                     {
                         path: "inventory",
-                        element: <CheckoutWrapper />,
+                        element: <Inventory />,
                     },
                 ],
             },

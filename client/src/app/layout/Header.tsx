@@ -30,8 +30,8 @@ export default function Header({ state, changeMode }: Props) {
     // using Redux store
     // const {basket} = store.getState().basket;
     // using Redux toolkit useSelector, or customly predefined useAppSelector
-    const { basket } = useAppSelector(state => state.basket);
-    const { user } = useAppSelector(state => state.account);
+    const { basket } = useAppSelector((state) => state.basket);
+    const { user } = useAppSelector((state) => state.account);
 
     const itemCount = basket?.items.reduce((acc, curr) => acc + curr.quantity, 0);
 
@@ -112,7 +112,7 @@ export default function Header({ state, changeMode }: Props) {
     return (
         <AppBar position="static">
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <Box display={'flex'} alignItems="center">
+                <Box display={"flex"} alignItems="center">
                     <Typography variant="h6" component={NavLink} to={"/"} sx={sxProps}>
                         Net Demo
                     </Typography>
@@ -127,24 +127,30 @@ export default function Header({ state, changeMode }: Props) {
                             {title.toUpperCase()}
                         </ListItem>
                     ))}
+                    {user && user.roles?.includes("Admin") && (
+                        <ListItem component={NavLink} to={"/inventory"} sx={sxProps}>
+                            INVENTORY
+                        </ListItem>
+                    )}
                 </List>
-                <Box display='flex' alignItems={"center"}>
+                <Box display="flex" alignItems={"center"}>
                     <IconButton aria-label="cart" sx={{ color: "inherit" }} component={Link} to="basket">
                         <StyledBadge badgeContent={itemCount} color="secondary">
                             <ShoppingCartIcon />
                         </StyledBadge>
                     </IconButton>
-                    {user ? (<SignedInMenu />) : (
+                    {user ? (
+                        <SignedInMenu />
+                    ) : (
                         <List sx={{ display: "flex" }}>
-                        {rightLinks.map(({ title, path }) => (
-                            <ListItem component={NavLink} to={path} key={path} sx={sxProps}>
-                                {title.toUpperCase()}
-                            </ListItem>
-                        ))}
-                    </List>
-                    )}                    
+                            {rightLinks.map(({ title, path }) => (
+                                <ListItem component={NavLink} to={path} key={path} sx={sxProps}>
+                                    {title.toUpperCase()}
+                                </ListItem>
+                            ))}
+                        </List>
+                    )}
                 </Box>
-
             </Toolbar>
         </AppBar>
     );
