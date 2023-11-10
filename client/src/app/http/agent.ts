@@ -62,6 +62,9 @@ axios.interceptors.response.use(
             case 401:
                 toast.error(data.title);
                 break;
+            case 403:
+                toast.error("You are not allowed to do that!");
+                break;
             case 404:
                 router.navigate("/notFound", { state: { error: data } });
                 break;
@@ -78,8 +81,27 @@ axios.interceptors.response.use(
 const requests = {
     get: (url: string, params?: URLSearchParams) => axios.get(url, { params }).then(responseBody),
     post: (url: string, body: object) => axios.post(url, body).then(responseBody),
+    postForm: (url: string, data: FormData) =>
+        axios.post(url, data, { headers: { "Content-type": "multipart/form-data" } }).then(responseBody),
     put: (url: string, body: object) => axios.put(url, body).then(responseBody),
+    putForm: (url: string, data: FormData) =>
+        axios.put(url, data, { headers: { "Content-type": "multipart/form-data" } }).then(responseBody),
     delete: (url: string) => axios.delete(url).then(responseBody),
+};
+
+//helper function to transform to FormData the received object
+function createFormData(item: any) {
+    const formData = new FormData();
+    for (const key in item) {
+        formData.append(key, item[key]);
+    }
+    return formData;
+}
+
+const Admin = {
+    createProduct: (product: any) => requests.postForm("products", createFormData(product)),
+    updateProduct: (product: any) => requests.putForm("products", createFormData(product)),
+    deleteProduct: (id: number) => requests.delete(`products/${id}`),
 };
 
 const Catalog = {
@@ -129,6 +151,7 @@ const agent = {
     Account,
     Orders,
     Payments,
+    Admin,
 };
 
 export default agent;

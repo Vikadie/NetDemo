@@ -1,9 +1,14 @@
 // instead of using statement there is a GlobalUsing.cs
 
+using System.Drawing;
+using API.RequestHelpers;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Adding the service classes to the container that we usually add to the StartUp class ConfigureServices method
 builder.Services.AddControllers();
+// adding the AutoMapper service to our services indicating that for it it can use the MappingProfiles class created by us and register its Assembly
+builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v3", new OpenApiInfo { Title = "WebAPIv7", Version = "v3" });
@@ -111,6 +116,9 @@ builder.Services.AddScoped<TokenService>();
 
 // adding the Payment service creates with Stripe
 builder.Services.AddScoped<PaymentService>();
+
+// adding the Image service creates with Cloudinary
+builder.Services.AddScoped<ImageService>();
 
 // finally referencing my app via builder.Build() to return it already configured
 var app = builder.Build();

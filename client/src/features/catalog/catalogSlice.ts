@@ -92,6 +92,14 @@ export const catalogSlice = createSlice({
         resetProductParams: (state) => {
             state.productParams = initParams();
         },
+        setProduct: (state) => {
+            // productsAdapter.upsertOne(state, action.payload);
+            state.productsLoaded = false; // this will run the dispatch(fetchProductsAsync()); from useProducts hook and will reload all the products again
+        },
+        removeProduct: (state) => {
+            // productsAdapter.removeOne(state, action.payload);
+            state.productsLoaded = false; // this will run the dispatch(fetchProductsAsync()); from useProducts hook and will reload all the products again
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(fetchProductsAsync.pending, (state) => {
@@ -135,4 +143,5 @@ export const catalogSlice = createSlice({
 
 export const productSelectors = productsAdapter.getSelectors((state: RootState) => state.catalog);
 
-export const { setProductParams, setMetaData, resetProductParams } = catalogSlice.actions;
+export const { setProductParams, setMetaData, resetProductParams, setProduct, removeProduct } =
+    catalogSlice.actions;
